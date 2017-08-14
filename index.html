@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+  <html>
+    <head>
+    <title> My first Leaflet map </title>
+    <link rel="stylesheet" href="main.css"/> 
+      <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"></script>
+    </head>
+  <body>
+    <H1>Example</H1>
+    <div id="map"></div>
+    <script>
+  //initialize the map         
+  var map = L.map('map').setView([42.378974, -71.785972], 12);
+  
+  //Create baselayer - tiles         
+  var backgroundMap = L.tileLayer('http://korona.geog.uni-heidelberg.de/tiles/roads/x={x}&y={y}&z={z}', {
+	maxZoom: 20,
+	attribution: 'Imagery from <a href="http://giscience.uni-hd.de/">GIScience Research Group @ University of Heidelberg</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+});
+  
+  backgroundMap.addTo(map);
+  var bakery = L.marker([42.367575, -71.783956]).addTo(map);
+  var popup = "My favorite bakery";
+bakery.bindPopup(popup); 
+var circle = L.circle([42.378974, -71.785972], 500, {
+  color: 'red',
+  fillColor: '#f03',
+  fillOpacity: 0.5
+}).addTo(map);
+// Create a marker first
+var geojsonMarkerOptions = {
+  radius: 8,
+  fillColor: "#ff7800",
+  color: "#000",
+  weight: 1,
+  opacity: 1,
+  fillOpacity: 0.8
+};
+
+//create a empty geojson layer
+var geojson = L.geoJson(null,{
+  pointToLayer: function (feature, latlng) {
+    return L.circleMarker(latlng, geojsonMarkerOptions);
+  }
+}).addTo(map);
+// new Http Request
+var xhttp = new XMLHttpRequest();
+
+// set the request method and data file
+xhttp.open('GET', encodeURI("All_BFRO_Reports_points.geojson"));
+
+//specify what must be done with the geojson data to the layer when request is succesfull
+xhttp.onload = function() {
+  if (xhttp.readyState === 4) {
+      // add the json data to the geojson layer we created before!
+      geojson.addData(JSON.parse(xhttp.responseText));
+    } else {
+      alert('Request failed.  Returned status of ' + xhttp.status);
+    }
+};
+
+// send the request
+xhttp.send();
+</script>
+  </body>
+</html>
